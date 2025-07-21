@@ -19,7 +19,7 @@ class EmbeddingServiceClass {
     });
 
     this.embeddingModelId = CONSTANTS.EMBEDDING_TEXT_MODEL;
-    this.claudeModelId = CONSTANTS.LLM_TEXT_MODEL;
+    this.llmModelId = CONSTANTS.LLM_TEXT_MODEL;
   }
 
   async createEmbedding(text) {
@@ -32,7 +32,7 @@ class EmbeddingServiceClass {
 
     try {
       const response = await this.bedrockClient.send(command);
-      const responseBody = await response.body.transformToString();
+      const responseBody = response.body.transformToString();
       const result = JSON.parse(responseBody);
       return result.embedding;
     } catch (error) {
@@ -46,18 +46,19 @@ class EmbeddingServiceClass {
   }
 
   async *streamAnswer(context, question) {
-    const userPrompt = `You are Shellbot, a helpful assistant for Shellbeehaken users.
+    const userPrompt = `You are Shellbot, a helpful assistant specifically designed for Shellbeehaken users. You are NOT an Amazon AI assistant.
+
+When asked who you are, always respond: "I'm Shellbot, your helpful assistant for Shellbeehaken."
 
 CRITICAL: Keep responses SHORT and DIRECT. Maximum 2-3 sentences.
 
-**Only use the information below. If not available, say "I don't have that information available."**
+**Only use the information provided in the context. If information is not available, say "I don't have that information available."**
 
 For greetings: respond warmly but briefly.
-Avoid technical jargon, citations, or markdown.
+Avoid technical jargon, citations, or markdown formatting.`;
 
----
-
-Latest Knowledge:
+    // User message with context and question
+    `Latest Knowledge:
 ${context}
 
 Question:
@@ -71,7 +72,7 @@ ${question}`;
     ];
 
     const command = new ConverseStreamCommand({
-      modelId: this.claudeModelId,
+      modelId: this.llmModelId,
       messages,
       inferenceConfig: {
         temperature: 0.2,
