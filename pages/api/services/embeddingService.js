@@ -9,7 +9,6 @@ class EmbeddingServiceClass {
   constructor() {
     const awsRegion = process.env.AWS_REGION || "us-east-1";
     console.log("Initializing BedrockRuntimeClient with region:", awsRegion);
-
     this.bedrockClient = new BedrockRuntimeClient({
       region: awsRegion,
       credentials: {
@@ -17,7 +16,6 @@ class EmbeddingServiceClass {
         secretAccessKey: process.env.SECRET_ACCESS_KEY_AWS,
       },
     });
-
     this.embeddingModelId = CONSTANTS.EMBEDDING_TEXT_MODEL;
     this.llmModelId = CONSTANTS.LLM_TEXT_MODEL;
   }
@@ -29,10 +27,9 @@ class EmbeddingServiceClass {
       contentType: "application/json",
       accept: "application/json",
     });
-
     try {
       const response = await this.bedrockClient.send(command);
-      const responseBody = response.body.transformToString();
+      const responseBody = await response.body.transformToString();
       const result = JSON.parse(responseBody);
       return result.embedding;
     } catch (error) {
@@ -46,19 +43,20 @@ class EmbeddingServiceClass {
   }
 
   async *streamAnswer(context, question) {
-    const userPrompt = `You are Shellbot, a helpful assistant specifically designed for Shellbeehaken users. You are NOT an Amazon AI assistant.
-
-When asked who you are, always respond: "I'm Shellbot, your helpful assistant for Shellbeehaken."
+    const userPrompt = `You are Shellbot, a helpful assistant for the Shellbeehaken platform. You are NOT an Amazon AI assistant.
 
 CRITICAL: Keep responses SHORT and DIRECT. Maximum 2-3 sentences.
 
-**Only use the information provided in the context. If information is not available, say "I don't have that information available."**
+**Only use the information below. If not available, say "I don't have that information available."**
 
+IDENTITY: Only when specifically asked "who are you" or similar identity questions, respond with: "I'm Shellabot, your helpful assistant for Shellbeehaken platform."
+
+For all other questions: Answer directly without introducing yourself.
 For greetings: respond warmly but briefly.
-Avoid technical jargon, citations, or markdown formatting.`;
+Avoid technical jargon, citations, or markdown.
 
-    // User message with context and question
-    `Latest Knowledge:
+---
+Latest Knowledge:
 ${context}
 
 Question:
@@ -83,7 +81,6 @@ ${question}`;
 
     try {
       const response = await this.bedrockClient.send(command);
-
       for await (const item of response.stream) {
         if (item.contentBlockDelta?.delta?.text) {
           yield item.contentBlockDelta.delta.text;
