@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.840.0",
+    "@aws-sdk/client-s3": "^3.850.0",
+    "@aws-sdk/client-transcribe": "^3.848.0",
+    "@aws-sdk/client-transcribe-streaming": "^3.848.0",
     "@pinecone-database/pinecone": "^6.1.1",
     "aos": "^2.3.4",
     "axios": "^1.7.7",
@@ -17,6 +20,7 @@
     "cors": "^2.8.5",
     "dropzone": "^6.0.0-beta.2",
     "font-awesome": "^4.7.0",
+    "formidable": "^3.5.4",
     "next": "13.3.4",
     "next-auth": "^4.24.8",
     "overlayscrollbars": "^2.2.1",

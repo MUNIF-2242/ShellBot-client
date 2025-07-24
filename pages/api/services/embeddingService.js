@@ -29,7 +29,7 @@ class EmbeddingServiceClass {
     });
     try {
       const response = await this.bedrockClient.send(command);
-      const responseBody = await response.body.transformToString();
+      const responseBody = response.body.transformToString();
       const result = JSON.parse(responseBody);
       return result.embedding;
     } catch (error) {
